@@ -4,7 +4,7 @@ import { MongoClient } from "mongodb";
 dotenv.config();
 
 const mongo_url_local = 'mongodb://127.0.0.1:27017';
-const mongo_url = process.env.MONGO_URL 
+const mongo_url = process.env.MONGO_URL || mongo_url_local
 
 const createConnection = async () => {
     const client = new MongoClient(mongo_url);
