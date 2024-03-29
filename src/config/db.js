@@ -2,12 +2,12 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 
 dotenv.config();
+const {MONGO_URL,MONGO_URL_LOCAL} = process.env
 
-const mongo_url_local = 'mongodb://127.0.0.1:27017';
-const mongo_url = process.env.MONGO_URL || mongo_url_local
+const MONGO_CONNECT = MONGO_URL || MONGO_URL_LOCAL;
 
 const createConnection = async () => {
-    const client = new MongoClient(mongo_url);
+    const client = new MongoClient(MONGO_CONNECT);
     await client.connect();
     console.log(`Mongodb is connected`);
     return client;
