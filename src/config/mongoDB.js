@@ -7,8 +7,8 @@ const {
     KMSDB_COUNTRY
 } = process.env
 
-// const MONGO_CONNECT = MONGO_URL_LIVE;
-const MONGO_CONNECT = MONGO_URL_LOCAL;
+const MONGO_CONNECT = MONGO_URL_LIVE;
+// const MONGO_CONNECT = MONGO_URL_LOCAL;
 
 const createConnection = async () => {
     const client = new MongoClient(MONGO_CONNECT);
