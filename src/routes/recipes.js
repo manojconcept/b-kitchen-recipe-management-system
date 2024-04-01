@@ -1,16 +1,16 @@
 import express from "express";
- 
+
 import * as recipeModel from "../models/recipes.js";
 
 const router = express.Router();
 
 const {
-    getAllRecipe, 
-    postRecipe, 
-    recipeResetIsDelete, 
-    recipeTruncate, 
-    recipeById, 
-    recipeIsDeleteById, 
+    getAllRecipe,
+    postRecipe,
+    recipeResetIsDelete,
+    recipeTruncate,
+    recipeById,
+    recipeIsDeleteById,
     recipeDeleteById,
     recipeUpdate
 
@@ -25,7 +25,7 @@ router.get("", async (req, res) => {
         res.send(result);
     } catch (error) {
         console.log("Error handling request", error);
-        res.status(500).send({message :"Internal Server Error"});
+        res.status(500).send({ message: "Internal Server Error" });
 
     }
 });
@@ -34,9 +34,9 @@ router.post("", async (req, res) => {
     try {
         const isPost = req.body;
         const preValue = await getAllRecipe(req)
-        const toIdPost = () =>{
+        const toIdPost = () => {
             const id = preValue.length + 1
-            return{...isPost,id}
+            return { ...isPost, id }
         }
         const result = await postRecipe(toIdPost)
         res.send(result);
@@ -47,42 +47,41 @@ router.post("", async (req, res) => {
     }
 })
 //-------------------> update
-router.put("/:id",async(req,res)=>{
-    try{
+router.put("/:id", async (req, res) => {
+    try {
         const { id } = req.params;
         const updatedRecipe = req.body;
-        const result = await recipeUpdate(id,updatedRecipe)
+        const result = await recipeUpdate(id, updatedRecipe)
         res.send(result)
-    }catch(error){
-        console.log("Error handling requeset",error)
-        res.status(304).send({message:"Not Modified"})
+    } catch (error) {
+        console.log("Error handling requeset", error)
+        res.status(304).send({ message: "Not Modified" })
     }
 })
 
 //-------------------------> reset update deleted false
-router.put("",async(req,res)=>{
-    try{
+router.put("", async (req, res) => {
+    try {
         const result = await recipeResetIsDelete();
         res.send(result);
-    }catch(error){
-        console.log("Error handling requeset",error)
-        res.status(304).send({message:"Not Modified"})
+    } catch (error) {
+        console.log("Error handling requeset", error)
+        res.status(304).send({ message: "Not Modified" })
     }
 })
 
-//---------------->truncate
+//--------------------------------->truncate
 router.delete("", async (req, res) => {
     try {
         const result = await recipeTruncate();
         res.send(result);
     } catch (error) {
         console.log("Error handling request", error);
-        res.status(204).send({message :"No Content"})
+        res.status(204).send({ message: "No Content" })
     }
 })
 
-
-//---> getId
+//--------------------------------------> getId
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
     console.log(id);
@@ -92,33 +91,33 @@ router.get("/:id", async (req, res) => {
         res.send(getsingleRecipe || message)
     } catch (error) {
         console.error("Error handling request:", error);
-        res.status(500).send({message :"Internal Server Error"});
+        res.status(500).send({ message: "Internal Server Error" });
     }
 });
 
 //---------------------------------------------> update single delete
-router.put("/:id",async(req,res)=>{
-    try{
-        const {id} = req.params;
+router.put("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
         const result = await recipeIsDeleteById(id);
         res.send(result);
-    }catch(error){
-        console.log("Error handling request:",error);
-        res.status(304).send({message:"Not Modified"})
+    } catch (error) {
+        console.log("Error handling request:", error);
+        res.status(304).send({ message: "Not Modified" })
 
     }
 })
 
 //----------------------------------------------------> real single delete
 
-router.delete("/:id",async(req,res)=>{
-    try{
-        const {id} = req.params;
+router.delete("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
         const result = await recipeDeleteById(id)
         res.send(result);
-    }catch(error){
-        console.log("Error handling request:",error);
-        res.status(204).send({message :"No Content"})
+    } catch (error) {
+        console.log("Error handling request:", error);
+        res.status(204).send({ message: "No Content" })
     }
 })
 

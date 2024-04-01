@@ -1,30 +1,20 @@
-import { KmsCollection } from "../config/mongoDB.js";
+import { KR_Client } from "../config/mongoDB.js";
 
-function postRecipe(toIdPost) {
-    return KmsCollection.insertOne(toIdPost());
-}
-function getAllRecipe(req) {
-    return KmsCollection.find(req.query).toArray();
-}
-function recipeResetIsDelete() {
-    return KmsCollection.updateMany({ "deleted": true }, { $set: { "deleted": false } });
-}
-function recipeTruncate() {
-    return KmsCollection.deleteMany();
-}
-function recipeById(id) {
-    return KmsCollection.findOne({ id: +id });
-}
-function recipeIsDeleteById(id) {
-    return KmsCollection.updateOne({ id: +id }, { $set: { "deleted": true } });
-}
-function recipeDeleteById(id) {
-    return KmsCollection.deleteOne({ id: +id });
-}
+const postRecipe = (toIdPost) => KR_Client.insertOne(toIdPost());
 
-function recipeUpdate(id, updatedRecipe) {
-    return KmsCollection.updateOne({ id: +id }, { $set: updatedRecipe })
-}
+const getAllRecipe = (req) => KR_Client.find(req.query).toArray();
+
+const recipeResetIsDelete = () => KR_Client.updateMany({ "deleted": true }, { $set: { "deleted": false } });
+
+const recipeTruncate = () => KR_Client.deleteMany();
+
+const recipeById = (id) => KR_Client.findOne({ id: +id });
+
+const recipeIsDeleteById = (id) => KR_Client.updateOne({ id: +id }, { $set: { "deleted": true } });
+
+const recipeDeleteById = (id) => KR_Client.deleteOne({ id: +id });
+
+const recipeUpdate = (id, updatedRecipe) => KR_Client.updateOne({ id: +id }, { $set: updatedRecipe })
 
 export {
     postRecipe,

@@ -1,7 +1,7 @@
 {
   "name": "kitchen-recipe-management-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "A kitchen recipe management system using Node.js and Express can be built without controllers, handling CRUD operations within routes. This simplifies the structure, with routes managing data, models for database interaction, and authentication/validation within routes. Testing and deployment ensure functionality.",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/manojconcept/b-kitchen-recipe-management-system.git"
   },
   "keywords": [
     "kitchen recipe management system"
@@ -19,10 +19,13 @@
   "author": "manojconcept",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
-    "mongodb": "^6.5.0"
+    "mongodb": "^6.5.0",
+    "mongoose": "^8.2.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
