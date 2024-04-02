@@ -1,8 +1,7 @@
 import express from 'express';
-import * as auth from "../config/auth.js"
-import * as userModel from "../models/user.js";
+import * as authUtils from "../config/authUtils.js"
+import * as userService from "../services/user.js";
 import moment from 'moment';
-
 
 const router = express.Router();
 const timeStamp = moment().format()
@@ -11,13 +10,16 @@ const {
     getAllUsers,
     getUserByName,
     userTruncate,
-} = userModel;
+} = userService;
 
 const {
     genPassword,
     compairePassword,
-} = auth
+    tokenGenerator
+} = authUtils;
 
+
+//To get all users
 router.get("", async (req, res) => {
     try {
         const result = await getAllUsers(req);
@@ -32,7 +34,7 @@ router.get("", async (req, res) => {
     }
 })
 
-
+//Truncate;
 router.delete("", async (req, res) => {
     try {
         const result = await userTruncate();
@@ -43,15 +45,16 @@ router.delete("", async (req, res) => {
     }
 })
 
-router.post("", async (req, res) => {
+//Register
+router.post("/register", async (req, res) => {
     try {
         const isCheck = await getAllUsers();
         const { username, password } = req.body;
         const userFromDB = await getUserByName({ username })
         const hashedPassword = await genPassword(password);
 
-        if(!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#]).{8,}$/g.test(password)){
-            res.status(400).send({message:"password Pattern does not match"})
+        if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#]).{8,}$/g.test(password)) {
+            res.status(400).send({ message: "password Pattern does not match" })
             return
         }
 
@@ -70,7 +73,7 @@ router.post("", async (req, res) => {
         }
 
         if (userFromDB) {
-            res.status(409).send({message:"Conflict"})
+            res.status(409).send({ message: "Conflict" })
             return;
         }
 
@@ -84,6 +87,29 @@ router.post("", async (req, res) => {
             }
         )
         res.send(result);
+    } catch (error) {
+        console.log("post Error");
+        res.status(422).send({ message: "Unprocessable Entity" })
+    }
+})
+
+//Login
+router.post("/login", async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const dataFromDB = await getUserByName({username}); // {}
+        //to check username and password
+        if (!dataFromDB) {
+            res.status(409).send({ message: "invalid credentials" })
+            return;
+        }
+        const isValidate = await compairePassword(password,dataFromDB.password)
+        if (!isValidate) {
+            res.status(409).send({ message: "invalid credentials" })
+            return;
+        }
+        const token = tokenGenerator({id:dataFromDB._id})
+        res.send({message:"Successful Login",token});
     } catch (error) {
         console.log("post Error");
         res.status(422).send({ message: "Unprocessable Entity" })

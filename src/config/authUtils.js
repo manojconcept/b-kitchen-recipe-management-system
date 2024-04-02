@@ -1,4 +1,7 @@
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+
+const {jwtSecretKey} = process.env
 
 //-------------------> no of rounds
 const rounds = 10;
@@ -16,8 +19,18 @@ const compairePassword = async (password,storedPassword) =>{
     return isPasswordMatch
 }
 
+//Generating Tokens
+//// unique should be an object***
+const tokenGenerator = (unique,secretKey=jwtSecretKey) => jwt.sign(unique,secretKey); 
+///verification
+const tokenVerifier = (token,secretKey=jwtSecretKey) =>jwt.verify(token,secretKey)
+
+
 
 export {
     genPassword,
     compairePassword,
+    tokenGenerator,
+    tokenVerifier
+    
 }

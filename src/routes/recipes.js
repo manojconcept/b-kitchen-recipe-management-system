@@ -1,11 +1,15 @@
 import express from "express";
 
-import * as recipeModel from "../models/recipes.js";
+import * as recipeService from "../services/recipes.js";
+import { tokenVerifier } from "../config/authUtils.js";
+import { auth } from "../middleware/auth.js";
 
+const app = express();
 const router = express.Router();
+app.use(tokenVerifier);
 
 const {
-    getAllRecipe,
+    getAllRecipe, 
     postRecipe,
     recipeResetIsDelete,
     recipeTruncate,
@@ -14,12 +18,12 @@ const {
     recipeDeleteById,
     recipeUpdate
 
-} = recipeModel
+} = recipeService
 
 const message = { message: "not found" }
 
 //---> data retrive
-router.get("", async (req, res) => {
+router.get("",auth, async (req, res) => {
     try {
         const result = await getAllRecipe(req);
         res.send(result);
