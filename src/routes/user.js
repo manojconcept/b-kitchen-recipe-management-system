@@ -61,6 +61,8 @@ router.post("/register", async (req, res) => {
         if (isCheck.length === 0) {
             const result = await createUser(
                 {
+                    fname,
+                    lname,
                     username,
                     password: hashedPassword,
                     id: 1,
@@ -79,6 +81,8 @@ router.post("/register", async (req, res) => {
 
         const result = await createUser(
             {
+                fname,
+                lname,
                 username,
                 password: hashedPassword,
                 id: userFromDB.length + 1,
@@ -115,11 +119,5 @@ router.post("/login", async (req, res) => {
         res.status(422).send({ message: "Unprocessable Entity" })
     }
 })
-
-
-router.post("/createdb", (req, res) => {
-
-})
-
 
 export const userRouter = router

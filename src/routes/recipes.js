@@ -22,7 +22,7 @@ const {
 const message = { message: "not found" }
 
 //---> data retrive
-router.get("", async (req, res) => {
+router.get("",async (req, res) => {
     try {
         const result = await getAllRecipe(req);
         res.send(result);
