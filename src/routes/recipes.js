@@ -44,15 +44,18 @@ router.get("/bylimit", async (req, res) => {
         const reqQuery = req.query;
         const { limit, ...queryParams } = reqQuery;
         const findTotalLength = await getAllRecipesfilter(queryParams);
-        console.log(findTotalLength.length);
+        const totalCount = findTotalLength.length || 0
         const data = await setLimitByGetAllRecipe(offset, batchSize, queryParams);
         console.log(data.length)
-        res.send({ success: true, data });
+        res.send({ success: true,totalCount, data });
     } catch (error) {
         console.error('Error fetching data:', error);
-        res.status(500).send({ success: false, error: 'Internal Server Error' });
+        res.status(500).send({ success: false,error: 'Internal Server Error' });
     }
 });
+
+
+
 
 
 //--------------> post
