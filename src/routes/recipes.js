@@ -8,21 +8,23 @@ const router = express.Router();
 app.use(auth);
 
 const {
-    getAllRecipe, 
+    getAllRecipe,
     postRecipe,
     recipeResetIsDelete,
     recipeTruncate,
     recipeById,
     recipeIsDeleteById,
     recipeDeleteById,
-    recipeUpdate
-    
+    recipeUpdate,
+    setLimitByGetAllRecipe,
+    getAllRecipesfilter
+
 } = recipeService
 
 const message = { message: "not found" }
 
 //---> data retrive
-router.get("",async (req, res) => {
+router.get("", async (req, res) => {
     try {
         const result = await getAllRecipe(req);
         res.send(result);
@@ -32,6 +34,27 @@ router.get("",async (req, res) => {
 
     }
 });
+
+
+router.get("/bylimit", async (req, res) => {
+    try {
+        const batchSize = 10; 
+        const currentPage = parseInt(req.query.page) || 1;
+        const offset = (currentPage - 1) * batchSize;
+        const reqQuery = req.query;
+        const { limit, ...queryParams } = reqQuery;
+        const findTotalLength = await getAllRecipesfilter(queryParams);
+        console.log(findTotalLength.length);
+        const data = await setLimitByGetAllRecipe(offset, batchSize, queryParams);
+        console.log(data.length)
+        res.send({ success: true, data });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).send({ success: false, error: 'Internal Server Error' });
+    }
+});
+
+
 //--------------> post
 router.post("", async (req, res) => {
     try {
