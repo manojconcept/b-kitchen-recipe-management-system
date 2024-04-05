@@ -4,9 +4,11 @@ const postRecipe = (toIdPost) => KR_Client.insertOne(toIdPost());
 
 const getAllRecipe = (req) => KR_Client.find(req.query).toArray();
 
-const getAllRecipesfilter = (req) => KR_Client.find(req).toArray();
-const setLimitByGetAllRecipe = (offset, batchSize, queryParams) => KR_Client.find(queryParams).skip(offset).limit(batchSize).toArray();
+const getAllRecipeBycount  = (req) => KR_Client.countDocuments(req);
 
+const getAllRecipesfilter = (req) => KR_Client.find(req).toArray();
+
+const setLimitByGetAllRecipe = (offset, batchSize, queryParams) => KR_Client.find(queryParams).skip(offset).limit(batchSize).toArray();
 
 const recipeResetIsDelete = () => KR_Client.updateMany({ "deleted": true }, { $set: { "deleted": false } });
 
@@ -30,5 +32,6 @@ export {
     recipeDeleteById,
     recipeUpdate,
     setLimitByGetAllRecipe,
-    getAllRecipesfilter
+    getAllRecipesfilter,
+    getAllRecipeBycount
 }

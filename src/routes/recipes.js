@@ -17,46 +17,29 @@ const {
     recipeDeleteById,
     recipeUpdate,
     setLimitByGetAllRecipe,
-    getAllRecipesfilter
+    getAllRecipesfilter,
+    getAllRecipeBycount
 
 } = recipeService
 
 const message = { message: "not found" }
 
-//---> data retrive
+//----> front page
 router.get("", async (req, res) => {
     try {
-        const result = await getAllRecipe(req);
-        res.send(result);
-    } catch (error) {
-        console.log("Error handling request", error);
-        res.status(500).send({ message: "Internal Server Error" });
-
-    }
-});
-
-
-router.get("/bylimit", async (req, res) => {
-    try {
-        const batchSize = 10; 
+        const batchSize = 10;
         const currentPage = parseInt(req.query.page) || 1;
         const offset = (currentPage - 1) * batchSize;
         const reqQuery = req.query;
         const { limit, ...queryParams } = reqQuery;
-        const findTotalLength = await getAllRecipesfilter(queryParams);
-        const totalCount = findTotalLength.length || 0
+        const count = await getAllRecipeBycount(queryParams);
         const data = await setLimitByGetAllRecipe(offset, batchSize, queryParams);
-        console.log(data.length)
-        res.send({ success: true,totalCount, data });
+        res.send({ success: true,count, data } || message);
     } catch (error) {
         console.error('Error fetching data:', error);
-        res.status(500).send({ success: false,error: 'Internal Server Error' });
+        res.status(500).send({ success: false, error: 'Internal Server Error' });
     }
 });
-
-
-
-
 
 //--------------> post
 router.post("", async (req, res) => {
