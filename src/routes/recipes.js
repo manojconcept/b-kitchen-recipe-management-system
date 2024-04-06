@@ -26,7 +26,7 @@ const message = { message: "not found" }
 //----> front page
 router.get("", async (req, res) => {
     try {
-        const batchSize = 10;
+        const batchSize = 12;
         const currentPage = parseInt(req.query.page) || 1;
         const offset = (currentPage - 1) * batchSize;
         const reqQuery = req.query;
