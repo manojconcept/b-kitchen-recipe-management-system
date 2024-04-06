@@ -17,7 +17,6 @@ const {
     recipeDeleteById,
     recipeUpdate,
     setLimitByGetAllRecipe,
-    getAllRecipesfilter,
     getAllRecipeBycount
 
 } = recipeService
@@ -32,8 +31,13 @@ router.get("", async (req, res) => {
         const offset = (currentPage - 1) * batchSize;
         const reqQuery = req.query;
         const { limit, ...queryParams } = reqQuery;
-        const count = await getAllRecipeBycount(queryParams);
+        const total_count = await getAllRecipeBycount(queryParams);
         const data = await setLimitByGetAllRecipe(offset, batchSize, queryParams);
+        const count = {
+            total_count,
+            batch_count:data.length,
+            page_count : currentPage
+        }
         res.send({ success: true,count, data } || message);
     } catch (error) {
         console.error('Error fetching data:', error);
