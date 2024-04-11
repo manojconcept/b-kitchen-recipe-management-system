@@ -12,21 +12,22 @@ const timeLog = moment().format('MMMM Do YYYY, h:mm:ss a');
 app.use(methodOverride("_method"));
 app.use(cors({
   origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
 }));
 app.use(express.json());
 
 
 
-app.use("/api/v1/user",userRouter);
-app.use("/api/v1/recipes",recipesRoute);
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/recipes", recipesRoute);
 
 app.listen(port, () => {
-    console.table([{
-        Status: "Active",
-        Port: port,
-        log: timeLog,
-        portal: `http://127.0.0.1:${port}/`,
-    }])
+  console.table([{
+    Status: "Active",
+    Port: port,
+    log: timeLog,
+    portal: `http://127.0.0.1:${port}/`,
+  }])
 }
 );
 
