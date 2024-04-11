@@ -1,14 +1,11 @@
 import express from "express";
 
 import * as recipeService from "../services/recipes.js";
-import { auth } from "../middleware/auth.js";
+import { timeStamp,recipeTypes } from "../config/utils.js";
 
-const app = express();
 const router = express.Router();
-app.use(auth);
 
 const {
-    getAllRecipe,
     postRecipe,
     recipeResetIsDelete,
     recipeTruncate,
@@ -17,8 +14,10 @@ const {
     recipeDeleteById,
     recipeUpdate,
     setLimitByGetAllRecipe,
-    getAllRecipeBycount
-
+    getAllRecipeBycount,
+    // getRecipeRecentlyAdd,
+    recipeTimeUpdate,
+    getRecipeAllTypes,
 } = recipeService
 
 const message = { message: "not found" }
@@ -26,36 +25,88 @@ const message = { message: "not found" }
 //----> front page
 router.get("", async (req, res) => {
     try {
-        console.log(req.query)
         const batchSize = 12;
         const currentPage = parseInt(req.query.limit) || 1;
         const offset = (currentPage - 1) * batchSize;
         const reqQuery = req.query;
+        console.log(reqQuery)
         const { limit, ...queryParams } = reqQuery;
+
         const total_count = await getAllRecipeBycount(queryParams);
+        const types = await getRecipeAllTypes()
         const data = await setLimitByGetAllRecipe(offset, batchSize, queryParams);
+
+        // const getRecently = await getRecipeRecentlyAdd();
+        // console.log(getRecently);
+        
         const count = {
             total_count,
             batch_count:data.length,
             page_count : currentPage
-        }
-        res.send({ success: true,count, data } || message);
+        };
+        res.send({ success: true,count,types, data } || message);
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send({ success: false, error: 'Internal Server Error' });
     }
 });
+//------------------------->count
+router.get("/recipesCount", async (req,res)=>{
+    try {
+        const counts = {};
+        for (const recipeType in recipeTypes) {
+            counts[recipeType] = {};
+            for (const subtype of recipeTypes[recipeType]) {
+                counts[recipeType][subtype] = await getAllRecipeBycount({ [recipeType]: subtype });
+            }
+        }
+        console.log(counts) ;
+        res.send({ success: true,total:counts})
+
+    }catch(error){
+        console.error('Error fetching data:', error);
+        res.status(500).send({ success: false, error: 'Internal Server Error' });
+    }
+}
+)
 
 //--------------> post
 router.post("", async (req, res) => {
     try {
-        const isPost = req.body;
-        const preValue = await getAllRecipe(req)
-        const toIdPost = () => {
-            const id = preValue.length + 1
-            return { ...isPost, id }
+        const {
+            name,
+            image_url,
+            description,
+            cuisine,
+            course,
+            diet,
+            prep_time,
+            ingredients,
+            instructions,
+            // userid,
+        } = req.body;
+
+        const preValue = await getAllRecipeBycount()
+        const value = {
+            name,
+            image_url,
+            description,
+            cuisine,
+            course,
+            diet,
+            prep_time,
+            ingredients,
+            instructions,
+            timeStamp:timeStamp(),
+            image_available : 1,
+            id:preValue+1,
+            saved:"",
+            created:"manojconcept",
+            // userid:userid,
+            deleted:false
         }
-        const result = await postRecipe(toIdPost)
+
+        const result = await postRecipe(value)
         res.send(result);
 
     } catch (error) {
@@ -64,9 +115,10 @@ router.post("", async (req, res) => {
     }
 })
 //-------------------> update
-router.put("/:id", async (req, res) => {
+router.put("/:id?_method=PUT", async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(id)
         const updatedRecipe = req.body;
         const result = await recipeUpdate(id, updatedRecipe)
         res.send(result)
@@ -76,7 +128,21 @@ router.put("/:id", async (req, res) => {
     }
 })
 
-//-------------------------> reset update deleted false
+//----------------------------->  reset all time stamp;
+router.put("/timeupdate",async (req, res) => {
+    try{
+        const result = await recipeTimeUpdate()
+        console.log(result);
+        
+        res.send(result)
+
+    }catch{
+        console.log("Error handling requeset", error)
+        res.status(304).send({ message: "Not Modified" })
+    }
+});
+
+//-------------------------> boolean reset update deleted false
 router.put("", async (req, res) => {
     try {
         const result = await recipeResetIsDelete();
@@ -116,6 +182,7 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(id);
         const result = await recipeIsDeleteById(id);
         res.send(result);
     } catch (error) {
@@ -125,7 +192,7 @@ router.put("/:id", async (req, res) => {
     }
 })
 
-//----------------------------------------------------> real single delete
+//----------------------------------------------------> single delete
 
 router.delete("/:id", async (req, res) => {
     try {
@@ -137,5 +204,7 @@ router.delete("/:id", async (req, res) => {
         res.status(204).send({ message: "No Content" })
     }
 })
+
+//-------------------------------------------------------> count api
 
 export const recipesRoute = router

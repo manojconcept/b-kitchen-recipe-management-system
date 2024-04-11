@@ -48,8 +48,8 @@ router.delete("", async (req, res) => {
 //Register
 router.post("/register", async (req, res) => {
     try {
+        const { fname, lname,username, password } = req.body;
         const isCheck = await getAllUsers();
-        const { username, password } = req.body;
         const userFromDB = await getUserByName({ username })
         const hashedPassword = await genPassword(password);
 
@@ -85,15 +85,26 @@ router.post("/register", async (req, res) => {
                 lname,
                 username,
                 password: hashedPassword,
-                id: userFromDB.length + 1,
+                id: isCheck.length + 1,
                 created: timeStamp,
                 ban: false
             }
         )
         res.send(result);
     } catch (error) {
-        console.log("post Error");
         res.status(422).send({ message: "Unprocessable Entity" })
+    }
+})
+
+//Create Inventory
+router.post("/addinventroy",async(req,res)=>{
+    try {
+        const { username } = req.body;
+        const userFromDB = await getUserByName({ username });
+        console.log(userFromDB);
+
+    }catch(error){
+        res.status(422).send({message:"unprocessableEntity"});
     }
 })
 
