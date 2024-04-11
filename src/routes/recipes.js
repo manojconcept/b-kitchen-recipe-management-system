@@ -129,7 +129,7 @@ router.put("/:id?_method=PUT", async (req, res) => {
 })
 
 //----------------------------->  reset all time stamp;
-router.put("/timeupdate?_method=PUT",async (req, res) => {
+router.put("/timeupdate",async (req, res) => {
     try{
         const result = await recipeTimeUpdate()
         console.log(result);
