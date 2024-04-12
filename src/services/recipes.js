@@ -16,6 +16,7 @@ const recipeTruncate = () => KR_Client.deleteMany();
 const recipeById = (id) => KR_Client.findOne({ id: +id });
 
 const recipeIsDeleteById = (id) => KR_Client.updateOne({ id: +id }, { $set: { "deleted": true } });
+
 const recipeDeleteById = (id) => KR_Client.deleteOne({ id: +id });
 
 const recipeUpdate = (id, updatedRecipe) => KR_Client.updateOne({ id: +id }, { $set: updatedRecipe })
@@ -40,15 +41,6 @@ const getRecipeAllTypes = async () => {
         console.error('Error:', error);
     }
 }
-
-
-
-
-
-
-
-
-
 
 
 export {

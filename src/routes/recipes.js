@@ -25,7 +25,7 @@ const message = { message: "not found" }
 router.use(auth)
 
 //----> front page
-router.get("", async (req, res) => {
+router.get("",async (req, res) => {
     try {
         const batchSize = 12;
         const currentPage = parseInt(req.query.limit) || 1;
