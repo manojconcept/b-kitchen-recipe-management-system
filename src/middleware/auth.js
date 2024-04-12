@@ -2,7 +2,7 @@ import { tokenVerifier } from "../config/authUtils.js";
 
 const auth = (req, res, next) => {
     try {
-        const token = req.header("x-auth-token")
+        const token = req.header("Authorization")
         console.log(token);
         tokenVerifier(token)
         next();

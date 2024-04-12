@@ -111,20 +111,35 @@ router.post("/addinventroy",async(req,res)=>{
 //Login
 router.post("/login", async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const dataFromDB = await getUserByName({username}); // {}
-        //to check username and password
+        const usernamedb = req.body.username
+        const passworddb = req.body.password
+        const dataFromDB = await getUserByName({username:usernamedb});
+        
+        const {_id,
+            fname,
+            lname,
+            username,
+            id,
+
+        } = dataFromDB;
+
+        const userData = {
+            fname,
+            lname,
+            username,
+        }
         if (!dataFromDB) {
             res.status(409).send({ message: "invalid credentials" })
             return;
         }
-        const isValidate = await compairePassword(password,dataFromDB.password)
+        const isValidate = await compairePassword(passworddb,dataFromDB.password)
         if (!isValidate) {
             res.status(409).send({ message: "invalid credentials" })
             return;
         }
+        
         const token = tokenGenerator({id:dataFromDB._id})
-        res.send({message:"Successful Login",token});
+        res.send({message:"Successful Login",userData,token});
     } catch (error) {
         console.log("post Error");
         res.status(422).send({ message: "Unprocessable Entity" })

@@ -1,5 +1,5 @@
 import express from "express";
-
+import { auth } from "../middleware/auth.js";
 import * as recipeService from "../services/recipes.js";
 import { timeStamp,recipeTypes } from "../config/utils.js";
 
@@ -22,6 +22,8 @@ const {
 
 const message = { message: "not found" }
 
+router.use(auth)
+
 //----> front page
 router.get("", async (req, res) => {
     try {
@@ -29,7 +31,6 @@ router.get("", async (req, res) => {
         const currentPage = parseInt(req.query.limit) || 1;
         const offset = (currentPage - 1) * batchSize;
         const reqQuery = req.query;
-        console.log(reqQuery)
         const { limit, ...queryParams } = reqQuery;
 
         const total_count = await getAllRecipeBycount(queryParams);
