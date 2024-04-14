@@ -1,7 +1,9 @@
 import express from "express";
 import { auth } from "../middleware/auth.js";
 import * as recipeService from "../services/recipes.js";
-import { timeStamp,recipeTypes } from "../config/utils.js";
+import * as userService from "../services/user.js";
+import * as kmrsuserService from "../services/krmsusers.js";
+import { timeStamp, recipeTypes } from "../config/utils.js";
 
 const router = express.Router();
 
@@ -20,12 +22,21 @@ const {
     getRecipeAllTypes,
 } = recipeService
 
+const {
+    getUserByName
+} = userService
+
+const {
+    createUserRecipesListAddon,
+    countUserRecipesListAddon,
+} = kmrsuserService
+
 const message = { message: "not found" }
 
 router.use(auth)
 
 //----> front page
-router.get("",async (req, res) => {
+router.get("", async (req, res) => {
     try {
         const batchSize = 12;
         const currentPage = parseInt(req.query.limit) || 1;
@@ -39,20 +50,20 @@ router.get("",async (req, res) => {
 
         // const getRecently = await getRecipeRecentlyAdd();
         // console.log(getRecently);
-        
+
         const count = {
             total_count,
-            batch_count:data.length,
-            page_count : currentPage
+            batch_count: data.length,
+            page_count: currentPage
         };
-        res.send({ success: true,count,types, data } || message);
+        res.send({ success: true, count, types, data } || message);
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send({ success: false, error: 'Internal Server Error' });
     }
 });
 //------------------------->count
-router.get("/recipesCount", async (req,res)=>{
+router.get("/recipesCount", async (req, res) => {
     try {
         const counts = {};
         for (const recipeType in recipeTypes) {
@@ -61,10 +72,10 @@ router.get("/recipesCount", async (req,res)=>{
                 counts[recipeType][subtype] = await getAllRecipeBycount({ [recipeType]: subtype });
             }
         }
-        console.log(counts) ;
-        res.send({ success: true,total:counts})
+        console.log(counts);
+        res.send({ success: true, total: counts })
 
-    }catch(error){
+    } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send({ success: false, error: 'Internal Server Error' });
     }
@@ -74,6 +85,7 @@ router.get("/recipesCount", async (req,res)=>{
 //--------------> post
 router.post("", async (req, res) => {
     try {
+
         const {
             name,
             image_url,
@@ -84,10 +96,20 @@ router.post("", async (req, res) => {
             prep_time,
             ingredients,
             instructions,
-            // userid,
+            created,
         } = req.body;
 
-        const preValue = await getAllRecipeBycount()
+        const totalRecipeCount = await getAllRecipeBycount()
+        const userDetails = await getUserByName({ username: created })
+        const userObjId = JSON.stringify(userDetails._id)
+        const kmrsUserCountListAddonCount = await countUserRecipesListAddon(userObjId)
+        const countCheck = () => {
+            if (kmrsUserCountListAddonCount === 0) {
+                return totalRecipeCount + 1
+            }
+            return totalRecipeCount + (kmrsUserCountListAddonCount + 1);
+        }
+
         const value = {
             name,
             image_url,
@@ -98,16 +120,22 @@ router.post("", async (req, res) => {
             prep_time,
             ingredients,
             instructions,
-            timeStamp:timeStamp(),
-            image_available : 1,
-            id:preValue+1,
-            saved:"",
-            created:"manojconcept",
-            // userid:userid,
-            deleted:false
+            timeStamp: timeStamp(),
+            image_available: 1,
+            id: countCheck(),
+            saved: "",
+            created,
+            deleted: false
         }
 
-        const result = await postRecipe(value)
+        /*
+        1. get username from post,
+        2. get getUserByName --> from there take object  _id --> make that into  stringify;
+        3.then pass it in the functon
+         */
+
+        const result = await createUserRecipesListAddon(userObjId,value);
+        // const result = await postRecipe(value)
         res.send(result);
 
     } catch (error) {
@@ -130,14 +158,14 @@ router.put("/:id?_method=PUT", async (req, res) => {
 })
 
 //----------------------------->  reset all time stamp;
-router.put("/timeupdate",async (req, res) => {
-    try{
+router.put("/timeupdate", async (req, res) => {
+    try {
         const result = await recipeTimeUpdate()
         console.log(result);
-        
+
         res.send(result)
 
-    }catch{
+    } catch {
         console.log("Error handling requeset", error)
         res.status(304).send({ message: "Not Modified" })
     }

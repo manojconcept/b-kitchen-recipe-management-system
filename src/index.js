@@ -5,6 +5,7 @@ import cors from "cors"
 
 import { recipesRoute } from "./routes/recipes.js";
 import { userRouter } from "./routes/user.js";
+import { krmsUserRouter } from "./routes/krmsusers.js";
 
 const app = express();
 const port = 7000;
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/recipes", recipesRoute);
+app.use("/api/v1/inventory", krmsUserRouter)
 
 app.listen(port, () => {
   console.table([{
