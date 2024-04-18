@@ -53,7 +53,7 @@ router.post("/register", async (req, res) => {
         const userFromDB = await getUserByName({ username })
         const hashedPassword = await genPassword(password);
 
-        if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#]).{8,}$/g.test(password)) {
+        if (!/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,}$/g.test(password)) {
             res.status(400).send({ message: "password Pattern does not match" })
             return
         }
